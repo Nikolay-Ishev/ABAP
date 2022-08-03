@@ -1,0 +1,28 @@
+CLASS zcl_reverse_string DEFINITION PUBLIC.
+  PUBLIC SECTION.
+    METHODS reverse_string
+      IMPORTING
+        input         TYPE string
+      RETURNING
+        VALUE(result) TYPE string.
+ENDCLASS.
+CLASS zcl_reverse_string IMPLEMENTATION.
+  METHOD reverse_string.
+    data : l_len type i.
+    data : l_revstr type string.
+    IF input IS INITIAL.
+      result = ||.
+    ELSE.
+      l_len = strlen( input ).
+      do.
+      l_len = l_len - 1.
+      concatenate l_revstr input+l_len(1) into l_revstr.
+      if l_len = 0.
+         exit.
+      endif.
+      enddo.
+      result = l_revstr.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+
