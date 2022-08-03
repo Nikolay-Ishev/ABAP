@@ -1,0 +1,115 @@
+* Given a word, compute the Scrabble score for that word.
+
+CLASS zcl_scrabble_score DEFINITION PUBLIC .
+  PUBLIC SECTION.
+    METHODS score
+      IMPORTING
+        input         TYPE string OPTIONAL
+      RETURNING
+        VALUE(result) TYPE i.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+CLASS zcl_scrabble_score IMPLEMENTATION.
+  METHOD score.
+    DO strlen( input ) TIMES.
+      data(lv_ch) = to_upper( substring( val = input off = sy-index - 1 len = 1 ) ).
+      data(lv_value) = COND #(
+        WHEN lv_ch CA 'AEIOULNRST' THEN 1
+        WHEN lv_ch CA 'DG' THEN 2
+        WHEN lv_ch CA 'BCMP' THEN 3
+        WHEN lv_ch CA 'FHVWY' THEN 4
+        WHEN lv_ch CA 'K' THEN 5
+        WHEN lv_ch CA 'JX' THEN 8
+        WHEN lv_ch CA 'QZ' THEN 10
+        ELSE 0
+      ).
+    result += lv_value.
+  enddo.
+  ENDMETHOD.
+ENDCLASS.
+
+
+
+
+CLASS lcl_scrabble_score DEFINITION.
+
+  PUBLIC SECTION.
+*   define a type containing a scrabble letter and its value
+    TYPES:BEGIN OF ts_scrabble_type,
+          letter TYPE c LENGTH 1,
+          value  TYPE i.
+    TYPES END OF ts_scrabble_type.
+*   define a scrabble table type
+    TYPES tt_scrabble
+          TYPE HASHED TABLE OF ts_scrabble_type
+          WITH UNIQUE KEY letter.
+*   define local table scrabble
+    CLASS-DATA mt_scrabble TYPE tt_scrabble.
+
+    CLASS-METHODS class_constructor.
+
+    METHODS score
+      IMPORTING
+        input         TYPE string OPTIONAL
+      RETURNING
+        VALUE(result) TYPE i.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+
+ENDCLASS.
+
+
+CLASS lcl_scrabble_score IMPLEMENTATION.
+
+  METHOD score.
+    DATA(lv_length) = STRLEN( input ).
+*   string iteration
+    WHILE sy-index <= lv_length.
+      DATA(lv_index) = sy-index - 1.
+      DATA(lv_current_symbol) = input+lv_index(1).
+      TRANSLATE lv_current_symbol TO UPPER CASE.
+
+      READ TABLE mt_scrabble
+      WITH TABLE KEY letter = lv_current_symbol
+      ASSIGNING FIELD-SYMBOL(<fs>).
+      IF <fs> IS NOT ASSIGNED.
+        CONTINUE.
+      ENDIF.
+      result += <fs>-value.
+  ENDWHILE.
+
+  ENDMETHOD.
+
+  METHOD class_constructor.
+    lcl_scrabble_score=>mt_scrabble = VALUE #(
+    ( letter = 'A' value = 1 )
+    ( letter = 'B' value = 3 )
+    ( letter = 'C' value = 3 )
+    ( letter = 'D' value = 2 )
+    ( letter = 'E' value = 1 )
+    ( letter = 'F' value = 4 )
+    ( letter = 'G' value = 2 )
+    ( letter = 'H' value = 4 )
+    ( letter = 'I' value = 1 )
+    ( letter = 'J' value = 8 )
+    ( letter = 'K' value = 5 )
+    ( letter = 'L' value = 1 )
+    ( letter = 'M' value = 3 )
+    ( letter = 'N' value = 1 )
+    ( letter = 'O' value = 1 )
+    ( letter = 'P' value = 3 )
+    ( letter = 'Q' value = 10 )
+    ( letter = 'R' value = 1 )
+    ( letter = 'S' value = 1 )
+    ( letter = 'T' value = 1 )
+    ( letter = 'U' value = 1 )
+    ( letter = 'V' value = 4 )
+    ( letter = 'W' value = 4 )
+    ( letter = 'X' value = 8 )
+    ( letter = 'Y' value = 4 )
+    ( letter = 'Z' value = 10 )
+    ).
+  ENDMETHOD.
+
+ENDCLASS.
