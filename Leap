@@ -1,0 +1,42 @@
+*--Given a year, report if it is a leap year.--
+
+CLASS zcl_leap DEFINITION PUBLIC.
+  PUBLIC SECTION.
+    METHODS is_divisible
+      IMPORTING
+        gv_year          TYPE i
+        gv_divisor       TYPE i
+      RETURNING
+        VALUE(result) TYPE abap_bool.
+    METHODS leap
+      IMPORTING
+        year          TYPE i
+      RETURNING
+        VALUE(result) TYPE abap_bool.
+ENDCLASS.
+CLASS zcl_leap IMPLEMENTATION.
+  METHOD is_divisible.
+    DATA(gv_div) = gv_year MOD gv_divisor.
+    IF gv_div = 0.
+      result = abap_true.
+    ELSE.
+      result = abap_false.
+    ENDIF.
+  ENDMETHOD.
+  METHOD leap.
+    IF is_divisible( gv_year = year gv_divisor = 4 ).
+      IF is_divisible( gv_year = year gv_divisor = 100 ).
+        IF is_divisible( gv_year = year gv_divisor = 400 ).
+          result = abap_true.
+          RETURN.
+        ENDIF.
+      result = abap_false.
+      RETURN.
+      ENDIF.
+    result = abap_true.
+    RETURN.
+    ELSE. 
+    result = abap_false.
+    ENDIF.    
+  ENDMETHOD.
+ENDCLASS.
