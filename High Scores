@@ -1,0 +1,59 @@
+*--Your task is to write methods that return the highest score from the list, 
+*--the last added score and the three highest scores.-----------------------
+
+CLASS zcl_high_scores DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+  PUBLIC SECTION.
+    TYPES integertab TYPE STANDARD TABLE OF i WITH EMPTY KEY.
+    METHODS constructor
+      IMPORTING
+        scores TYPE integertab.
+    METHODS list_scores
+      RETURNING
+        VALUE(result) TYPE integertab.
+    METHODS latest
+      RETURNING
+        VALUE(result) TYPE i.
+    METHODS personalbest
+      RETURNING
+        VALUE(result) TYPE i.
+    METHODS personaltopthree
+      RETURNING
+        VALUE(result) TYPE integertab.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    DATA scores_list TYPE integertab.
+ENDCLASS.
+CLASS zcl_high_scores IMPLEMENTATION.
+  METHOD constructor.
+    me->scores_list = scores.
+  ENDMETHOD.
+  METHOD list_scores.
+    result = me->scores_list.
+  ENDMETHOD.
+  METHOD latest.
+    DATA: lv_itlines TYPE i.
+    DESCRIBE TABLE me->scores_list LINES lv_itlines.
+    READ TABLE me->scores_list INDEX lv_itlines
+    ASSIGNING FIELD-SYMBOL(<fs>).
+    result = <fs>.
+  ENDMETHOD.
+  METHOD personalbest.
+    DATA lv_highest_score TYPE i.
+      LOOP AT me->scores_list INTO DATA(lv_current_score).
+        IF lv_current_score > lv_highest_score.
+         lv_highest_score = lv_current_score.
+        ENDIF.
+      ENDLOOP.
+    result = lv_highest_score.
+  ENDMETHOD.
+  METHOD personaltopthree.
+    DATA lt_topthree_scores TYPE integertab.
+    MOVE me->scores_list TO lt_topthree_scores.
+    SORT lt_topthree_scores DESCENDING.
+    DELETE lt_topthree_scores FROM 4.
+    result = lt_topthree_scores.
+  ENDMETHOD.
+ENDCLASS.
