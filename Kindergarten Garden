@@ -1,0 +1,65 @@
+CLASS zcl_kindergarten_garden DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+  PUBLIC SECTION.
+    METHODS plants
+      IMPORTING
+        diagram        TYPE string
+        student        TYPE string
+      RETURNING
+        VALUE(results) TYPE string_table.
+    METHODS cup1_position
+      IMPORTING
+        student       TYPE string
+      RETURNING
+        VALUE(result) TYPE i.
+    METHODS get_plant_name
+      IMPORTING
+          plant       TYPE string
+        RETURNING
+          VALUE(result) TYPE string.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    DATA students TYPE string_table.
+ENDCLASS.
+CLASS zcl_kindergarten_garden IMPLEMENTATION.
+  METHOD cup1_position.
+    CASE student.
+     WHEN 'Alice'. result = 0.
+     WHEN 'Bob'.   result = 2.
+     WHEN 'Charlie'. result = 4.
+     WHEN 'David'. result = 6.
+     WHEN 'Eve'. result = 8.
+     WHEN 'Fred'. result = 10.
+     WHEN 'Ginny'. result = 12.
+     WHEN 'Harriet'. result = 14.
+     WHEN 'Ileana'. result = 16.
+     WHEN 'Joseph'. result = 18.
+     WHEN 'Kincaid'. result = 20.
+     WHEN 'Larry'. result = 22.
+    ENDCASE.
+  ENDMETHOD.
+  METHOD get_plant_name.
+    CASE plant.
+     WHEN 'V'. result = 'violets'.
+     WHEN 'C'.   result = 'clover'.
+     WHEN 'R'. result = 'radishes'.
+     WHEN 'G'. result = 'grass'.
+    ENDCASE.
+  ENDMETHOD.
+  METHOD plants.
+    SPLIT diagram AT '\n' INTO DATA(lv_first_row) DATA(lv_second_row).
+    DATA(lv_cup1) = cup1_position( student ).
+    DATA(lv_cup2) = lv_cup1 + 1.
+*   TARGET_VAR =  SOURCE_VAR [ + ][ no_of_pos_from_start ] ( num_of_char_len)
+    DATA(lv_flower1) = lv_first_row+lv_cup1(1).
+    DATA(lv_flower2) = lv_first_row+lv_cup2(1).
+    DATA(lv_flower3) = lv_second_row+lv_cup1(1).
+    DATA(lv_flower4) = lv_second_row+lv_cup2(1).
+    APPEND get_plant_name( lv_flower1 ) TO results.
+    APPEND get_plant_name( lv_flower2 ) TO results.
+    APPEND get_plant_name( lv_flower3 ) TO results.
+    APPEND get_plant_name( lv_flower4 ) TO results.
+  ENDMETHOD.
+ENDCLASS.
