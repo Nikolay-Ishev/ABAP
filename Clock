@@ -1,0 +1,35 @@
+CLASS zcl_clock DEFINITION
+  PUBLIC
+  CREATE PUBLIC.
+  PUBLIC SECTION.
+    METHODS constructor
+      IMPORTING
+        hours   TYPE i
+        minutes TYPE i DEFAULT 0.
+    METHODS get
+      RETURNING
+        VALUE(result) TYPE string.
+    METHODS add
+      IMPORTING
+        minutes TYPE i.
+    METHODS sub
+      IMPORTING
+        minutes TYPE i.
+  PRIVATE SECTION.
+    DATA lv_time TYPE t VALUE 0.
+ENDCLASS.
+CLASS zcl_clock IMPLEMENTATION.
+  METHOD add.
+    lv_time += minutes * 60.
+  ENDMETHOD.
+  METHOD constructor.
+    lv_time += minutes * 60.
+    lv_time += hours * 3600.
+  ENDMETHOD.
+  METHOD get.
+    result = |{ lv_time(2) }:{ lv_time+2(2) }|.
+  ENDMETHOD.
+  METHOD sub.
+    lv_time -= minutes * 60.
+  ENDMETHOD.
+ENDCLASS.
