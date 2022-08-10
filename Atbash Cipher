@@ -1,0 +1,64 @@
+CLASS zcl_atbash_cipher DEFINITION PUBLIC FINAL CREATE PUBLIC.
+  PUBLIC SECTION.
+    CLASS-METHODS:
+      class_constructor.
+    METHODS:
+      decode
+        IMPORTING
+          cipher_text TYPE string
+        RETURNING
+          VALUE(plain_text)  TYPE string,
+      encode
+        IMPORTING
+          plain_text        TYPE string
+        RETURNING
+          VALUE(cipher_text) TYPE string.
+  PRIVATE SECTION.
+    CLASS-DATA:
+      lv_plain  TYPE string,
+      lv_cipher TYPE string.
+ENDCLASS.
+CLASS zcl_atbash_cipher IMPLEMENTATION.
+  METHOD class_constructor.
+    lv_plain  = to_lower( sy-abcde ).
+    lv_cipher = reverse( lv_plain ).
+  ENDMETHOD.
+  METHOD decode.
+    DO strlen( cipher_text ) TIMES.
+      DATA(lv_offset) = sy-index - 1.
+      DATA(lv_value) = to_lower( cipher_text+lv_offset(1) ).
+      DATA(lv_position) = find( val = lv_cipher sub = lv_value ).
+      IF lv_position < 0 AND lv_value NA '0123456789'.
+        CONTINUE.
+      ENDIF.
+      IF lv_value CA '0123456789'.
+        plain_text = |{ plain_text }{ lv_value }|.
+      ELSE.
+        plain_text = |{ plain_text }{ lv_plain+lv_position(1) }|.
+      ENDIF.
+    ENDDO.
+    plain_text = condense( plain_text ).
+  ENDMETHOD.
+  METHOD encode.
+    DATA(lv_counter) = 0.
+    DO strlen( plain_text ) TIMES.
+      DATA(lv_offset) = sy-index - 1.
+      DATA(lv_value) = to_lower( plain_text+lv_offset(1) ).
+      DATA(lv_position) = find( val = lv_plain sub = lv_value ).
+      IF lv_position < 0 AND lv_value NA '0123456789'.
+        CONTINUE.
+      ENDIF.
+      lv_counter = lv_counter + 1.
+      IF lv_value CA '0123456789'.
+        cipher_text = |{ cipher_text }{ lv_value }|.
+      ELSE.
+        cipher_text = |{ cipher_text }{ lv_cipher+lv_position(1) }|.
+      ENDIF.
+      IF lv_counter = 5.
+        cipher_text = |{ cipher_text } |.
+        lv_counter = 0.
+      ENDIF.
+    ENDDO.
+    cipher_text = condense( cipher_text ).
+  ENDMETHOD.
+ENDCLASS.
