@@ -1,0 +1,49 @@
+CLASS zcl_nth_prime DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+  PUBLIC SECTION.
+    METHODS prime
+      IMPORTING
+        input         TYPE i
+      RETURNING
+        VALUE(result) TYPE i
+      RAISING
+        cx_parameter_invalid.
+    METHODS constructor.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    TYPES tt_int_table
+      TYPE STANDARD TABLE OF i.
+    DATA lt_primes TYPE tt_int_table.
+ENDCLASS.
+CLASS zcl_nth_prime IMPLEMENTATION.
+  METHOD constructor.
+    APPEND 2 TO lt_primes.
+  ENDMETHOD.
+  METHOD prime.
+    DATA lv_current_num TYPE i VALUE 3.
+    IF input <= 0.
+      RAISE EXCEPTION TYPE cx_parameter_invalid.
+    ENDIF.
+    DO.
+      IF lines( lt_primes ) = input.
+        result = lt_primes[ lines( lt_primes ) ].
+        EXIT.
+      ENDIF.
+*To prove whether a number is a prime number try dividing it by prime numbers
+      DATA(lv_is_prime) = abap_true.
+      DO lines( lt_primes ) TIMES.
+        DATA(lv_current_prime) = lt_primes[ sy-index ].
+        IF lv_current_num MOD lv_current_prime = 0.
+          lv_is_prime = abap_false.
+          EXIT.
+        ENDIF.
+      ENDDO.
+      IF lv_is_prime = abap_true.
+        APPEND lv_current_num TO lt_primes.
+      ENDIF.
+      lv_current_num += 1.
+    ENDDO.
+  ENDMETHOD.
+ENDCLASS.
